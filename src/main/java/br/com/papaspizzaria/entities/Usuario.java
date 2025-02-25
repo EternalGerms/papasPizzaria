@@ -2,10 +2,13 @@ package br.com.papaspizzaria.entities;
 
 
 
-import org.antlr.v4.runtime.misc.NotNull;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import br.com.papaspizzaria.dto.UsuarioDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,34 +24,53 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "nome_completo")
+	@Column(nullable = false)
 	private String nomeCompleto;
 	
+	@Column(nullable = false, unique = true)
 	private String cpfcnpj;
+	
+	@Column(nullable = false, unique = true)
 	private String email;
+	
+	@Column(nullable = false)
 	private String telefone;
+	
+	@Column(nullable = false)
 	private Integer tipo;
+	
+	@Column(nullable = false)
 	private Boolean ativado;
+	
+	@Column(nullable = false, unique = true)
 	private String login;
+	
+	@Column(nullable = false)
 	private String senha;
 	
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Usuario other = (Usuario) obj;
+		return Objects.equals(id, other.id);
+	}
+	
+	public Usuario(UsuarioDTO usuario) {
+		BeanUtils.copyProperties(usuario, this);
+	}
 	
 	
 	public Usuario() {
-	}
-
-	public Usuario(Long id, String nomeCompleto, String cpfcnpj, String email, String telefone, Integer tipo,
-			Boolean ativado, String login, String senha) {
-		super();
-		this.id = id;
-		this.nomeCompleto = nomeCompleto;
-		this.cpfcnpj = cpfcnpj;
-		this.email = email;
-		this.telefone = telefone;
-		this.tipo = tipo;
-		this.ativado = ativado;
-		this.login = login;
-		this.senha = senha;
 	}
 
 	public Long getId() {
@@ -59,12 +81,12 @@ public class Usuario {
 		this.id = id;
 	}
 
-	public String getNome_completo() {
+	public String getNomeCompleto() {
 		return nomeCompleto;
 	}
 
-	public void setNome_completo(String nome_completo) {
-		this.nomeCompleto = nome_completo;
+	public void setNomeCompleto(String nomeCompleto) {
+		this.nomeCompleto = nomeCompleto;
 	}
 
 	public String getCpfcnpj() {
@@ -122,6 +144,11 @@ public class Usuario {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
+
+
+	
+	
+	
 	
 	
 	

@@ -1,37 +1,46 @@
 package br.com.papaspizzaria.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.papaspizzaria.dto.UsuarioDTO;
 import br.com.papaspizzaria.entities.Usuario;
 import br.com.papaspizzaria.repositories.UsuarioRepository;
 
 @Service
 public class UsuarioService {
 
+	@Autowired
     private UsuarioRepository usuarioRepository;
     
-    @Autowired
     public UsuarioService(UsuarioRepository usuarioRepository) {
     	this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> listarUsuarios() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        return usuarios.stream().map(UsuarioDTO::new).toList();
     }
 
-    public Optional<Usuario> buscarUsuarioPorId(Long id) {
-        return usuarioRepository.findById(id);
+    public void salvarUsuario(UsuarioDTO usuario) {
+    	Usuario usuarioEntity = new Usuario(usuario);
+    	usuarioRepository.save(usuarioEntity);
+    }
+    
+    public UsuarioDTO alterarUsuario(UsuarioDTO usuario) {
+    	Usuario usuarioEntity = new Usuario(usuario);
+    	return new UsuarioDTO(usuarioRepository.save(usuarioEntity));
     }
 
-    public Usuario salvarUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+    public void excluirUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).get();
+        usuarioRepository.delete(usuario);
     }
-
-    public void deletarUsuario(Long id) {
-        usuarioRepository.deleteById(id);
+    
+    public UsuarioDTO buscarUsuario(Long id) {
+    	return new UsuarioDTO(usuarioRepository.findById(id).get());
     }
+    
 }
