@@ -2,8 +2,6 @@ package br.com.papaspizzaria.entities;
 
 
 
-import java.util.Objects;
-
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -15,10 +13,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "usuario")
+
+// Organiza a resposta do JSON... Sim... Frescura necessária...
 @JsonPropertyOrder({ "id", "nome_completo", "cpfcnpj", "email", "telefone", "tipo", "ativado", "login", "senha" })
+
+// Implementa todos os Gets e Sets sem todas aquelas linhas de código
+@Getter
+@Setter
+
+// Cria um construtor padrão sem argumentos
+@NoArgsConstructor
+
+// Cria a função equals e hashcode para o ID da entidade
+@EqualsAndHashCode(of = "id")
 public class Usuario {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,114 +62,9 @@ public class Usuario {
 	@Column(nullable = false)
 	private String senha;
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Usuario other = (Usuario) obj;
-		return Objects.equals(id, other.id);
-	}
-	
 	public Usuario(UsuarioDTO usuario) {
 		BeanUtils.copyProperties(usuario, this);
 	}
-	
-	
-	public Usuario() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getNomeCompleto() {
-		return nomeCompleto;
-	}
-
-	public void setNomeCompleto(String nomeCompleto) {
-		this.nomeCompleto = nomeCompleto;
-	}
-
-	public String getCpfcnpj() {
-		return cpfcnpj;
-	}
-
-	public void setCpfcnpj(String cpfcnpj) {
-		this.cpfcnpj = cpfcnpj;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getTelefone() {
-		return telefone;
-	}
-
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
-
-	public Integer getTipo() {
-		return tipo;
-	}
-
-	public void setTipo(Integer tipo) {
-		this.tipo = tipo;
-	}
-
-	public Boolean getAtivado() {
-		return ativado;
-	}
-
-	public void setAtivado(Boolean ativado) {
-		this.ativado = ativado;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 
 }
