@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.papaspizzaria.dto.UsuarioDTO;
+import br.com.papaspizzaria.entities.TipoSituacaoUsuario;
 import br.com.papaspizzaria.entities.Usuario;
 import br.com.papaspizzaria.repositories.UsuarioRepository;
 
@@ -32,6 +33,18 @@ public class UsuarioService {
     	Usuario usuarioEntity = new Usuario(usuario);
     	usuarioEntity.setSenha(passwordEncoder.encode(usuario.getSenha()));
     	usuarioRepository.save(usuarioEntity);
+    }
+    
+    public void registrarNovoUsuario(UsuarioDTO usuario) {
+    	Usuario usuarioEntity = new Usuario(usuario);
+    	usuarioEntity.setSenha(passwordEncoder.encode(usuario.getSenha()));
+    	usuarioEntity.setSituacao(TipoSituacaoUsuario.PENDENTE);
+    	usuarioEntity.setId(null);
+    	usuarioRepository.save(usuarioEntity);
+    	
+    	//TODO Enviar um email para verificar a conta
+    	
+    	
     }
     
     public UsuarioDTO alterarUsuario(UsuarioDTO usuario) {
