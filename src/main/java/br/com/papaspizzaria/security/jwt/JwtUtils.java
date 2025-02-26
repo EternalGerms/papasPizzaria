@@ -26,6 +26,7 @@ public class JwtUtils {
 	@Value("${papapizzaria.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
+	// TODO Atualizar código para não usar de métodos/funções deprecated
 	public String generateTokenFromUserDetailsImpl(UserDetailsImpl userDetail) {
 		return Jwts.builder().setSubject(userDetail.getUsername()).setIssuedAt(new Date())
 				.setExpiration(new Date(new Date().getTime() + jwtExpirationMs))

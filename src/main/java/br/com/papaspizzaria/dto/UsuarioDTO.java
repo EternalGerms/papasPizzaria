@@ -2,6 +2,7 @@ package br.com.papaspizzaria.dto;
 
 import org.springframework.beans.BeanUtils;
 
+import br.com.papaspizzaria.entities.TipoSituacaoUsuario;
 import br.com.papaspizzaria.entities.Usuario;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class UsuarioDTO {
 	private String email;
 	private String telefone;
 	private Integer tipo;
-	private Boolean ativado = false;
+	private TipoSituacaoUsuario situacao;
 	private String login;
 	private String senha;
 	
