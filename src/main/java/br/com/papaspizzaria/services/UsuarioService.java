@@ -3,6 +3,7 @@ package br.com.papaspizzaria.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.papaspizzaria.dto.UsuarioDTO;
@@ -11,6 +12,9 @@ import br.com.papaspizzaria.repositories.UsuarioRepository;
 
 @Service
 public class UsuarioService {
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
     private UsuarioRepository usuarioRepository;
@@ -26,11 +30,13 @@ public class UsuarioService {
 
     public void salvarUsuario(UsuarioDTO usuario) {
     	Usuario usuarioEntity = new Usuario(usuario);
+    	usuarioEntity.setSenha(passwordEncoder.encode(usuario.getSenha()));
     	usuarioRepository.save(usuarioEntity);
     }
     
     public UsuarioDTO alterarUsuario(UsuarioDTO usuario) {
     	Usuario usuarioEntity = new Usuario(usuario);
+    	usuarioEntity.setSenha(passwordEncoder.encode(usuario.getSenha()));
     	return new UsuarioDTO(usuarioRepository.save(usuarioEntity));
     }
 

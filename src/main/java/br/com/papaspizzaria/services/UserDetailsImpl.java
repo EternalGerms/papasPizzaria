@@ -1,9 +1,12 @@
 package br.com.papaspizzaria.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import br.com.papaspizzaria.entities.Usuario;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -12,6 +15,23 @@ public class UserDetailsImpl implements UserDetails {
 	private String login;
 	private String email;
 	private String senha;
+	
+	
+	
+	public UserDetailsImpl(Long id, String name, String login, String senha , String email,
+			Collection<? extends GrantedAuthority> authorities) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.login = login;
+		this.senha = senha;
+		this.email = email;
+		this.authorities = authorities;
+	}
+
+	public static UserDetailsImpl build(Usuario usuario) {
+		return new UserDetailsImpl(usuario.getId(), usuario.getNomeCompleto(), usuario.getLogin(), usuario.getSenha(), usuario.getEmail(), new ArrayList<>());
+	}
 	
 	private Collection<? extends GrantedAuthority> authorities;
 	

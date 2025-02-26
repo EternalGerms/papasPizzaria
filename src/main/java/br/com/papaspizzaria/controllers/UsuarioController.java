@@ -50,6 +50,11 @@ public class UsuarioController {
     	usuarioService.excluirUsuario(id);
     	return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/test")
+    public String Teste() {
+    	return "Teste!";
+    }
 }
 
 
