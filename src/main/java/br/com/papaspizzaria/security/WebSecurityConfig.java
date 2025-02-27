@@ -45,9 +45,12 @@ public class WebSecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
-											   .requestMatchers("/usuarios/**").permitAll()
-											   .anyRequest().authenticated());
+			.authorizeHttpRequests(auth -> auth
+					.requestMatchers("/auth/**").permitAll()
+					.requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
+					.requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
+					.requestMatchers("/usuarios/testFuncionario").hasRole("FUNCIONARIO")
+					.anyRequest().authenticated());
 		
 		
 		http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);

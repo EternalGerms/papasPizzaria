@@ -51,10 +51,16 @@ public class UsuarioController {
     	return ResponseEntity.ok().build();
     }
     
-    @GetMapping("/test")
+    @GetMapping("/testUser")
     public String Teste() {
-    	return "Teste!";
+    	return "Olá usuário!";
     }
+    
+    @GetMapping("/testFuncionario")
+    public String TesteFunc() {
+    	return "Olá funcionário!";
+    }
+    
 }
 
 

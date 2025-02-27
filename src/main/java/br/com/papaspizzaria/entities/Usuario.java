@@ -2,11 +2,16 @@ package br.com.papaspizzaria.entities;
 
 
 
+import java.util.Collection;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import br.com.papaspizzaria.dto.UsuarioDTO;
+import edu.emory.mathcs.backport.java.util.Collections;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,6 +69,14 @@ public class Usuario {
 	
 	@Column(nullable = false)
 	private String senha;
+	
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		if (tipo == 2) {
+			return Collections.singletonList(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
+		} else {
+			return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+		}
+	}
 	
 	
 	
