@@ -3,7 +3,8 @@ package br.com.papaspizzaria.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+//Gera automaticamente os métodos getters e setters para os campos
+@Getter 
 @Setter
 public class AcessDTO {
 	

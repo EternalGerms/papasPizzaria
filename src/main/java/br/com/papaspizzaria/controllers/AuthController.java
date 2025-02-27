@@ -17,7 +17,7 @@ import br.com.papaspizzaria.services.UsuarioService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin
+@CrossOrigin // Permite requisição de diferentes origens - CORDS - útil talvez para o frontend posteriormente
 public class AuthController {
 	
 	@Autowired
@@ -26,19 +26,19 @@ public class AuthController {
 	@Autowired
 	private UsuarioService usuarioService;
 	
-	@PostMapping(value = "/login")
+	@PostMapping(value = "/login") // Endpoint para autenticação de usuário
 	public ResponseEntity<?> login(@RequestBody AuthenticationDTO authDto) {
 		return ResponseEntity.ok(authService.login(authDto));
 		
 	}
 	
-	@PostMapping(value = "/registro")
+	@PostMapping(value = "/registro") // Endpoint para registro de novo usuário
 	public void register(@RequestBody UsuarioDTO usuario) {
 		usuarioService.registrarNovoUsuario(usuario);
 		
 	}
 	
-	@GetMapping(value = "/validar-cadastro/{uuid}")
+	@GetMapping(value = "/validar-cadastro/{uuid}") // Endpoint para validar cadastro usando UUID
 	public String verificarCadastro(@PathVariable("uuid") String uuid) {
 		return usuarioService.verificarCadastro(uuid);
 		// TODO melhorar tratamento de exceção

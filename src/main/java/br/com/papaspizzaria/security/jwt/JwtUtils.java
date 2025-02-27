@@ -20,28 +20,31 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtils {
 
-	@Value("${papapizzaria.jwtSecret}")
+	@Value("${papapizzaria.jwtSecret}") // Injeta a chave secreta do JWT a partir do arquivo de configuração
 	private String jwtSecret;
 
-	@Value("${papapizzaria.jwtExpirationMs}")
+	@Value("${papapizzaria.jwtExpirationMs}") // Injeta o tempo de expiração do token a partir do arquivo de configuração
 	private int jwtExpirationMs;
 
 	// TODO Atualizar código para não usar de métodos/funções deprecated
 	public String generateTokenFromUserDetailsImpl(UserDetailsImpl userDetail) {
 		return Jwts.builder().setSubject(userDetail.getUsername()).setIssuedAt(new Date())
 				.setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
-				.signWith(getSigninKey(), SignatureAlgorithm.HS512).compact();
+				.signWith(getSigninKey(), SignatureAlgorithm.HS512).compact(); // Assina o token com a chave secreta
 	}
 
+	// Método para obter a chave de assinatura a partir da chave secreta
 	public Key getSigninKey() {
-		SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+		SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret)); // Decodifica a chave secreta e cria uma chave HMAC
 		return key;
 	}
 	
+	// Método para extrair o login (subject) do token JWT
 	public String getLoginToken(String token) {
 		return Jwts.parser().setSigningKey(getSigninKey()).build().parseClaimsJws(token).getBody().getSubject();
 	}
 
+	// Método para validar um token JWT
 	public boolean validateJwtToken(String authToken) {
 		try {
 			Jwts.parser().setSigningKey(getSigninKey()).build().parseClaimsJws(authToken);

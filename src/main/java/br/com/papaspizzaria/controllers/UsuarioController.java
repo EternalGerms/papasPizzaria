@@ -19,7 +19,7 @@ import br.com.papaspizzaria.services.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin
+@CrossOrigin // Permite requisições de diferentes origens (CORS)
 public class UsuarioController {
 
     @Autowired
@@ -51,12 +51,12 @@ public class UsuarioController {
     	return ResponseEntity.ok().build();
     }
     
-    @GetMapping("/testUser")
+    @GetMapping("/testUser") // Endpoint de teste para clientes -> Retirar depois
     public String Teste() {
     	return "Olá usuário!";
     }
     
-    @GetMapping("/testFuncionario")
+    @GetMapping("/testFuncionario") // Endpoint de teste para funcionários -> Retirar depois
     public String TesteFunc() {
     	return "Olá funcionário!";
     }

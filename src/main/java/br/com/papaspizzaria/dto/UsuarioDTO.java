@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+//Gera automaticamente os métodos getters e setters para os campos, e o construtor padrão sem argumentos
 @Getter
 @Setter
 @NoArgsConstructor

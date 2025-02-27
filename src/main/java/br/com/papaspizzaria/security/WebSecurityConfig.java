@@ -22,12 +22,12 @@ import br.com.papaspizzaria.security.jwt.AuthFilterToken;
 public class WebSecurityConfig {
 	
 	@Autowired
-	private AuthEntryPointJwt unauthorizedHandler;
+	private AuthEntryPointJwt unauthorizedHandler; // Handler para tratar erros de autenticação
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+		return new BCryptPasswordEncoder(); // Configura o encoder de senhas (BCrypt)
+	} 
 	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -36,12 +36,14 @@ public class WebSecurityConfig {
 	
 	@Bean
 	public AuthFilterToken authFilterToken() {
-		return new AuthFilterToken();
+		return new AuthFilterToken(); // Filtro personalizado para validar tokens JWT
 	}
 	
+	
+	// Acesso e Restrição de requisições conforme ROLE, Autenticação ou Acesso Livre.
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors(Customizer.withDefaults());
+		http.cors(Customizer.withDefaults()); // Habilita CORS com configurações padrão
 		http.csrf(csrf -> csrf.disable())
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,10 +55,10 @@ public class WebSecurityConfig {
 					.anyRequest().authenticated());
 		
 		
-		http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT antes do filtro de autenticação padrão
 		
 		
-		return http.build();
+		return http.build(); // Constrói e retorna a configuração de segurança
 		
 	}
 

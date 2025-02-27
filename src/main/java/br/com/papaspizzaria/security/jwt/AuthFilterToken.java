@@ -35,10 +35,13 @@ public class AuthFilterToken extends OncePerRequestFilter {
 				String login = jwtUtil.getLoginToken(jwt);
 
 				UserDetails userDetails = userDetailService.loadUserByUsername(login);
+				
+				// Cria um objeto de autenticação com os detalhes do usuário
 				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,
 						userDetails.getAuthorities());
 				auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				
+				// Define o contexto de segurança com o objeto de autenticação
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			}
 
@@ -53,6 +56,7 @@ public class AuthFilterToken extends OncePerRequestFilter {
 
 	}
 
+	// Método para extrair o token JWT do cabeçalho "Authorization"
 	private String getToken(HttpServletRequest request) {
 		String headerToken = request.getHeader("Authorization");
 		if (StringUtils.hasText(headerToken) && headerToken.startsWith("Bearer")) {
