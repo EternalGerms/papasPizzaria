@@ -71,11 +71,11 @@ public class Usuario {
 	private String senha;
 	
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if (tipo == 2) {
-			return Collections.singletonList(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
-		} else {
-			return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
-		}
+	    if (this.tipo == 2) { // Supondo que 2 seja o tipo para FUNCIONARIO/ADMIN
+	        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
+	    } else {
+	        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+	    }
 	}
 	
 	

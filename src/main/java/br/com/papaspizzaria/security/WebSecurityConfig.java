@@ -3,6 +3,7 @@ package br.com.papaspizzaria.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -43,23 +44,26 @@ public class WebSecurityConfig {
 	// Acesso e Restrição de requisições conforme ROLE, Autenticação ou Acesso Livre.
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors(Customizer.withDefaults()); // Habilita CORS com configurações padrão
-		http.csrf(csrf -> csrf.disable())
-			.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/auth/**").permitAll()
-					.requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
-					.requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
-					.requestMatchers("/usuarios/testFuncionario").hasRole("FUNCIONARIO")
-					.anyRequest().authenticated());
-		
-		
-		http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT antes do filtro de autenticação padrão
-		
-		
-		return http.build(); // Constrói e retorna a configuração de segurança
-		
+	    http.cors(Customizer.withDefaults());
+	    http.csrf(csrf -> csrf.disable())
+	        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .authorizeHttpRequests(auth -> auth
+	                .requestMatchers("/auth/**").permitAll()
+	                // Endpoints públicos
+	                .requestMatchers(HttpMethod.GET, "/produtos").permitAll()
+	                .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
+	                // Endpoints que exigem autenticação como FUNCIONARIO (admin)
+	                .requestMatchers(HttpMethod.POST, "/produtos").hasRole("FUNCIONARIO")
+	                .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("FUNCIONARIO")
+	                .requestMatchers(HttpMethod.DELETE, "/produtos/**").hasRole("FUNCIONARIO")
+	                // Outras configurações
+	                .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
+	                .requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
+	                .anyRequest().authenticated());
+	    
+	    http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
+	    return http.build();
 	}
 
 }
