@@ -10,7 +10,7 @@
 | Manter Usuário            | Matheus             | 02/03/2025            | 🟢     |
 | Autenticação de Usuário   | Matheus             | 15/03/2025            | 🟢     |
 | Elaboração de Relatórios  | Rafael              | 30/03/2025            | 🟡     |
-| Manter Produtos           | Bruno Bueno         | 02/03/2025            | 🟡     |
+| Manter Produtos           | Bruno Bueno         | 02/03/2025            | 🟢     |
 | Visualização de Produto   | Rebeca              | 09/04/2025            | 🟡     |
 | Manter Pedidos            | Bruno Bueno         | 12/03/2025            | 🟡     |
 | Personalização de Pedidos | Bruno Bueno         | 22/03/2025            | 🟡     |
