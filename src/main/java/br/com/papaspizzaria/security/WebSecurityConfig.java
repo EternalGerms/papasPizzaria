@@ -49,18 +49,24 @@ public class WebSecurityConfig {
 	        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .authorizeHttpRequests(auth -> auth
-	                .requestMatchers("/auth/**").permitAll()
-	                // Endpoints públicos
-	                .requestMatchers(HttpMethod.GET, "/produtos").permitAll()
-	                .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
-	                // Endpoints que exigem autenticação como FUNCIONARIO (admin)
-	                .requestMatchers(HttpMethod.POST, "/produtos").hasRole("FUNCIONARIO")
-	                .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("FUNCIONARIO")
-	                .requestMatchers(HttpMethod.DELETE, "/produtos/**").hasRole("FUNCIONARIO")
-	                // Outras configurações
-	                .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
-	                .requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
-	                .anyRequest().authenticated());
+	            .requestMatchers("/auth/**").permitAll()
+	            
+	            // Endpoints públicos
+	            .requestMatchers(HttpMethod.GET, "/produtos").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
+	            
+	            // Endpoints de endereços - ORDEM IMPORTANTE!
+	            .requestMatchers(HttpMethod.GET, "/enderecos").hasRole("FUNCIONARIO") // Específico primeiro
+	            .requestMatchers(HttpMethod.GET, "/enderecos/cliente/**").authenticated()
+	            .requestMatchers(HttpMethod.POST, "/enderecos").authenticated()
+	            .requestMatchers(HttpMethod.PUT, "/enderecos/**").authenticated()
+	            .requestMatchers(HttpMethod.DELETE, "/enderecos/**").authenticated()
+	            
+	            // Outras configurações
+	            .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
+	            .requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
+	            .anyRequest().authenticated()
+	        );
 	    
 	    http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
 	    return http.build();

@@ -95,5 +95,10 @@ public class UsuarioService {
 	public UsuarioDTO buscarUsuario(Long id) {
 		return new UsuarioDTO(usuarioRepository.findById(id).get());
 	}
+	
+	public Usuario buscarUsuarioPorLogin(String login) {
+	    return usuarioRepository.findByLogin(login)
+	            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+	}
 
 }
