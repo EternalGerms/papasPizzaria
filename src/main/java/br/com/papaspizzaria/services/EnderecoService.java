@@ -1,16 +1,17 @@
 package br.com.papaspizzaria.services;
 
-import br.com.papaspizzaria.dto.EnderecoDTO;
-import br.com.papaspizzaria.entities.Endereco;
-import br.com.papaspizzaria.entities.Usuario;
-import br.com.papaspizzaria.repositories.EnderecoRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import br.com.papaspizzaria.dto.EnderecoDTO;
+import br.com.papaspizzaria.entities.Endereco;
+import br.com.papaspizzaria.entities.Usuario;
+import br.com.papaspizzaria.repositories.EnderecoRepository;
 
 @Service
 public class EnderecoService {
@@ -62,7 +63,7 @@ public class EnderecoService {
         enderecoExistente.setBairro(enderecoDTO.getBairro());
         enderecoExistente.setNumero(enderecoDTO.getNumero());
         enderecoExistente.setComplemento(enderecoDTO.getComplemento());
-        enderecoExistente.setObservac(enderecoDTO.getObservacao());
+        enderecoExistente.setObservac(enderecoDTO.getObservac());
         
         enderecoRepository.save(enderecoExistente);
         return convertToDTO(enderecoExistente);
@@ -100,7 +101,7 @@ public class EnderecoService {
         dto.setBairro(endereco.getBairro());
         dto.setNumero(endereco.getNumero());
         dto.setComplemento(endereco.getComplemento());
-        dto.setObservacao(endereco.getObservac());
+        dto.setObservac(endereco.getObservac());
         return dto;
     }
     

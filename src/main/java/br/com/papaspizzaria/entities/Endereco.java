@@ -1,7 +1,12 @@
 package br.com.papaspizzaria.entities;
 
 import br.com.papaspizzaria.dto.EnderecoDTO;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +37,6 @@ public class Endereco {
         this.bairro = dto.getBairro();
         this.numero = dto.getNumero();
         this.complemento = dto.getComplemento();
-        this.observac = dto.getObservacao();
+        this.observac= dto.getObservac();
     }
 }

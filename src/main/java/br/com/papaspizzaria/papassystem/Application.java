@@ -1,4 +1,4 @@
-package br.com.papaspizzaria.papassytem;
+package br.com.papaspizzaria.papassystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
