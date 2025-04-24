@@ -84,7 +84,7 @@ public class EnderecoService {
         }
     }
 
-    private Usuario getUsuarioAutenticado() {
+    public Usuario getUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return usuarioService.buscarUsuarioPorLogin(authentication.getName());
     }

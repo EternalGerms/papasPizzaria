@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.papaspizzaria.dto.EnderecoDTO;
 import br.com.papaspizzaria.services.EnderecoService;
+import br.com.papaspizzaria.entities.Usuario;
 
 @RestController
 @RequestMapping("/enderecos")
@@ -55,10 +56,14 @@ public class EnderecoController {
     }
     
     @GetMapping
-    @PreAuthorize("hasRole('FUNCIONARIO')") // Apenas funcionários
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<EnderecoDTO>> listarTodos() {
-    	System.out.println("Endpoint /enderecos acessado"); // Log de depuração
-        return ResponseEntity.ok(enderecoService.listarTodosEnderecos());
+        Usuario usuarioAutenticado = enderecoService.getUsuarioAutenticado();
+        if (usuarioAutenticado.getTipo() == 2) { // Se for funcionário
+            return ResponseEntity.ok(enderecoService.listarTodosEnderecos());
+        } else { // Se for cliente
+            return ResponseEntity.ok(enderecoService.listarEnderecosDoUsuario(usuarioAutenticado.getId().intValue()));
+        }
     }
     
 }

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import br.com.papaspizzaria.security.jwt.AuthEntryPointJwt;
 import br.com.papaspizzaria.security.jwt.AuthFilterToken;
@@ -54,13 +55,16 @@ public class WebSecurityConfig {
 	            // Endpoints públicos
 	            .requestMatchers(HttpMethod.GET, "/produtos").permitAll()
 	            .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
+	            .requestMatchers(HttpMethod.POST, "/produtos").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.DELETE, "/produtos/**").hasRole("FUNCIONARIO")
 	            
 	            // Endpoints de endereços - ORDEM IMPORTANTE!
-	            .requestMatchers(HttpMethod.GET, "/enderecos").hasRole("FUNCIONARIO") // Específico primeiro
 	            .requestMatchers(HttpMethod.GET, "/enderecos/cliente/**").authenticated()
 	            .requestMatchers(HttpMethod.POST, "/enderecos").authenticated()
 	            .requestMatchers(HttpMethod.PUT, "/enderecos/**").authenticated()
 	            .requestMatchers(HttpMethod.DELETE, "/enderecos/**").authenticated()
+	            .requestMatchers(HttpMethod.GET, "/enderecos/**").authenticated()
 	            
 	            // Outras configurações
 	            .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
