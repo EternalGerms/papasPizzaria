@@ -66,6 +66,11 @@ public class WebSecurityConfig {
 	            .requestMatchers(HttpMethod.DELETE, "/enderecos/**").authenticated()
 	            .requestMatchers(HttpMethod.GET, "/enderecos/**").authenticated()
 	            
+	            // Endpoints de pedidos
+	            .requestMatchers(HttpMethod.GET, "/pedidos/cliente/**").authenticated()
+	            .requestMatchers(HttpMethod.POST, "/pedidos").authenticated()
+	            .requestMatchers(HttpMethod.PUT, "/pedidos/**").hasRole("FUNCIONARIO")
+	            
 	            // Outras configurações
 	            .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")
 	            .requestMatchers("/usuarios/**").hasRole("FUNCIONARIO")
