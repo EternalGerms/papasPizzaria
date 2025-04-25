@@ -13,5 +13,4 @@ public interface EnderecoRepository extends JpaRepository<Endereco, Integer> {
     
     @Query("SELECT e FROM Endereco e WHERE e.id = :id AND e.idCliente = :idCliente")
     Endereco findByIdAndIdCliente(@Param("id") Integer id, @Param("idCliente") Integer idCliente);
-    List<Endereco> findAll(); // Já fornecido pelo JpaRepository
 }

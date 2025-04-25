@@ -11,7 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import br.com.papaspizzaria.dto.UsuarioDTO;
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
