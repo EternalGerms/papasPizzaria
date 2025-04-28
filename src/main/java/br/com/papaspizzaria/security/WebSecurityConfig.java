@@ -54,22 +54,26 @@ public class WebSecurityConfig {
 	            
 	            // Endpoints públicos
 	            .requestMatchers(HttpMethod.GET, "/produtos").permitAll()
-	            .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/produtos/{id}").permitAll()
 	            .requestMatchers(HttpMethod.POST, "/produtos").hasRole("FUNCIONARIO")
-	            .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("FUNCIONARIO")
-	            .requestMatchers(HttpMethod.DELETE, "/produtos/**").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.PUT, "/produtos/{id}").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.DELETE, "/produtos/{id}").hasRole("FUNCIONARIO")
 	            
-	            // Endpoints de endereços - ORDEM IMPORTANTE!
-	            .requestMatchers(HttpMethod.GET, "/enderecos/cliente/**").authenticated()
+	            // Endpoints de endereços
+	            .requestMatchers(HttpMethod.GET, "/enderecos/cliente/{id}").authenticated()
 	            .requestMatchers(HttpMethod.POST, "/enderecos").authenticated()
-	            .requestMatchers(HttpMethod.PUT, "/enderecos/**").authenticated()
-	            .requestMatchers(HttpMethod.DELETE, "/enderecos/**").authenticated()
-	            .requestMatchers(HttpMethod.GET, "/enderecos/**").authenticated()
+	            .requestMatchers(HttpMethod.PUT, "/enderecos/{id}").authenticated()
+	            .requestMatchers(HttpMethod.DELETE, "/enderecos/{id}").authenticated()
+	            .requestMatchers(HttpMethod.GET, "/enderecos/{id}").authenticated()
 	            
 	            // Endpoints de pedidos
-	            .requestMatchers(HttpMethod.GET, "/pedidos/cliente/**").authenticated()
+	            .requestMatchers(HttpMethod.GET, "/pedidos/meus-pedidos").authenticated()
+	            .requestMatchers(HttpMethod.GET, "/pedidos/cliente/{id}").hasRole("FUNCIONARIO")
 	            .requestMatchers(HttpMethod.POST, "/pedidos").authenticated()
-	            .requestMatchers(HttpMethod.PUT, "/pedidos/**").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.PUT, "/pedidos/{id}/status").hasRole("FUNCIONARIO")
+	            .requestMatchers(HttpMethod.PUT, "/pedidos/{id}").authenticated()
+	            .requestMatchers(HttpMethod.DELETE, "/pedidos/{id}").authenticated()
+	            .requestMatchers(HttpMethod.GET, "/pedidos/{id}").authenticated()
 	            
 	            // Outras configurações
 	            .requestMatchers("/usuarios/testUser").hasRole("CLIENTE")

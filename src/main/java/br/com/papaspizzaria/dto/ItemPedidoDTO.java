@@ -11,6 +11,5 @@ public class ItemPedidoDTO {
     private Integer produtoId;
     private Integer quantidade;
     private Double valorUnitario;
-    private Double valorTotal;
     private String observacoes;
 } 

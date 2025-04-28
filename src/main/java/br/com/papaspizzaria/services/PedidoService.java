@@ -3,6 +3,8 @@ package br.com.papaspizzaria.services;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,7 @@ import br.com.papaspizzaria.entities.ItemPedido;
 import br.com.papaspizzaria.entities.Usuario;
 import br.com.papaspizzaria.repositories.PedidoRepository;
 import br.com.papaspizzaria.repositories.ProdutoRepository;
+import br.com.papaspizzaria.repositories.EnderecoRepository;
 
 @Service
 public class PedidoService {
@@ -30,6 +33,9 @@ public class PedidoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Autowired
+    private EnderecoRepository enderecoRepository;
+
     public List<PedidoDTO> listarPedidosDoCliente(Long idCliente) {
         Usuario usuario = getUsuarioAutenticado();
         
@@ -40,6 +46,14 @@ public class PedidoService {
                     .collect(Collectors.toList());
         }
         throw new RuntimeException("Acesso não autorizado");
+    }
+
+    public List<PedidoDTO> listarPedidosDoClienteAutenticado() {
+        Usuario usuario = getUsuarioAutenticado();
+        return pedidoRepository.findByIdCliente(usuario.getId())
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -75,6 +89,98 @@ public class PedidoService {
         return convertToDTO(pedido);
     }
 
+    @Transactional
+    public PedidoDTO atualizarPedido(Long id, PedidoDTO pedidoDTO) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        
+        Usuario usuario = getUsuarioAutenticado();
+        
+        if (!isFuncionario() && !usuario.getId().equals(pedido.getIdCliente())) {
+            throw new RuntimeException("Acesso não autorizado. Cliente só pode editar seus próprios pedidos.");
+        }
+        
+        if (!"PENDENTE".equals(pedido.getStatus())) {
+            throw new RuntimeException("Não é possível editar o pedido. Apenas pedidos com status PENDENTE podem ser editados. Status atual: " + pedido.getStatus());
+        }
+
+        // Valida se o endereço existe e pertence ao cliente
+        if (pedidoDTO.getIdEndereco() != null) {
+            enderecoRepository.findById(pedidoDTO.getIdEndereco())
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+            
+            if (!isFuncionario() && !enderecoRepository.existsByIdAndIdCliente(pedidoDTO.getIdEndereco(), usuario.getId().intValue())) {
+                throw new RuntimeException("Endereço não pertence ao cliente");
+            }
+        }
+        
+        // Atualiza os campos permitidos
+        if (pedidoDTO.getIdEndereco() != null) {
+            pedido.setIdEndereco(pedidoDTO.getIdEndereco());
+        }
+        if (pedidoDTO.getValorTotal() != null) {
+            pedido.setValorTotal(pedidoDTO.getValorTotal());
+        }
+        if (pedidoDTO.getObservacoes() != null) {
+            pedido.setObservacoes(pedidoDTO.getObservacoes());
+        }
+        
+        // Atualiza os itens do pedido
+        if (pedidoDTO.getItens() != null && !pedidoDTO.getItens().isEmpty()) {
+            // Mapa para rastrear itens existentes
+            Map<Long, ItemPedido> itensExistentes = pedido.getItens().stream()
+                .collect(Collectors.toMap(ItemPedido::getId, item -> item));
+            
+            // Lista para armazenar os itens que serão mantidos
+            List<ItemPedido> itensAtualizados = new ArrayList<>();
+            
+            // Processa cada item do DTO
+            for (ItemPedidoDTO itemDTO : pedidoDTO.getItens()) {
+                // Valida se o produto existe
+                produtoRepository.findById(itemDTO.getProdutoId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + itemDTO.getProdutoId()));
+                
+                ItemPedido item;
+                if (itemDTO.getId() != null && itensExistentes.containsKey(itemDTO.getId())) {
+                    // Reutiliza o item existente
+                    item = itensExistentes.get(itemDTO.getId());
+                    item.setQuantidade(itemDTO.getQuantidade());
+                    item.setValorUnitario(itemDTO.getValorUnitario());
+                    item.setObservacoes(itemDTO.getObservacoes());
+                } else {
+                    // Cria um novo item
+                    item = convertToItemPedido(itemDTO);
+                    item.setPedido(pedido);
+                }
+                itensAtualizados.add(item);
+            }
+            
+            // Atualiza a lista de itens do pedido
+            pedido.getItens().clear();
+            pedido.getItens().addAll(itensAtualizados);
+        }
+        
+        return convertToDTO(pedidoRepository.save(pedido));
+    }
+
+    @Transactional
+    public void deletarPedido(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        
+        Usuario usuario = getUsuarioAutenticado();
+        
+        if (!isFuncionario() && !usuario.getId().equals(pedido.getIdCliente())) {
+            throw new RuntimeException("Acesso não autorizado. Cliente só pode remover seus próprios pedidos.");
+        }
+        
+        if (!"PENDENTE".equals(pedido.getStatus())) {
+            throw new RuntimeException("Não é possível remover o pedido. Apenas pedidos com status PENDENTE podem ser removidos. Status atual: " + pedido.getStatus());
+        }
+        
+        pedidoRepository.delete(pedido);
+    }
+
     public PedidoDTO atualizarStatus(Long id, String novoStatus) {
         if (!isFuncionario()) {
             throw new RuntimeException("Apenas funcionários podem atualizar o status do pedido");
@@ -83,8 +189,31 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
         
+        // Valida o novo status
+        if (!isStatusValido(novoStatus)) {
+            throw new RuntimeException("Status inválido. Os status permitidos são: PENDENTE, A_CAMINHO, ENTREGUE");
+        }
+        
         pedido.setStatus(novoStatus);
         return convertToDTO(pedidoRepository.save(pedido));
+    }
+
+    private boolean isStatusValido(String status) {
+        return "PENDENTE".equals(status) || 
+               "A_CAMINHO".equals(status) || 
+               "ENTREGUE".equals(status);
+    }
+
+    public PedidoDTO buscarPedidoPorId(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        
+        Usuario usuario = getUsuarioAutenticado();
+        if (!isFuncionario() && !usuario.getId().equals(pedido.getIdCliente())) {
+            throw new RuntimeException("Acesso não autorizado");
+        }
+        
+        return convertToDTO(pedido);
     }
 
     private boolean isFuncionario() {
@@ -122,7 +251,6 @@ public class PedidoService {
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado")));
         item.setQuantidade(dto.getQuantidade());
         item.setValorUnitario(dto.getValorUnitario());
-        item.setValorTotal(dto.getValorTotal());
         item.setObservacoes(dto.getObservacoes());
         return item;
     }
@@ -134,7 +262,6 @@ public class PedidoService {
         dto.setProdutoId(item.getProduto().getId());
         dto.setQuantidade(item.getQuantidade());
         dto.setValorUnitario(item.getValorUnitario());
-        dto.setValorTotal(item.getValorTotal());
         dto.setObservacoes(item.getObservacoes());
         return dto;
     }

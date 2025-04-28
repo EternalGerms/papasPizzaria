@@ -28,8 +28,5 @@ public class ItemPedido {
     @Column(name = "valor_unitario")
     private Double valorUnitario;
     
-    @Column(name = "valor_total")
-    private Double valorTotal;
-    
     private String observacoes;
 } 
