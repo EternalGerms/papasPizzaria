@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import br.com.papaspizzaria.dto.ItemPedidoDTO;
 import br.com.papaspizzaria.entities.Pedido;
 import br.com.papaspizzaria.entities.ItemPedido;
 import br.com.papaspizzaria.entities.Usuario;
+import br.com.papaspizzaria.entities.Produto;
 import br.com.papaspizzaria.repositories.PedidoRepository;
 import br.com.papaspizzaria.repositories.ProdutoRepository;
 import br.com.papaspizzaria.repositories.EnderecoRepository;
@@ -69,23 +71,33 @@ public class PedidoService {
         pedido.setIdEndereco(pedidoDTO.getIdEndereco());
         pedido.setDataHora(LocalDateTime.now());
         pedido.setStatus("PENDENTE");
-        pedido.setValorTotal(pedidoDTO.getValorTotal());
         pedido.setObservacoes(pedidoDTO.getObservacoes());
-        
-        // Save the order first to get the ID
-        pedido = pedidoRepository.save(pedido);
         
         // Handle items if they exist
         if (pedidoDTO.getItens() != null && !pedidoDTO.getItens().isEmpty()) {
+            double valorTotal = 0.0;
+            
             for (ItemPedidoDTO itemDTO : pedidoDTO.getItens()) {
-                ItemPedido item = convertToItemPedido(itemDTO);
+                // Busca o produto e seu preço
+                Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + itemDTO.getProdutoId()));
+                
+                ItemPedido item = new ItemPedido();
+                item.setProduto(produto);
+                item.setQuantidade(itemDTO.getQuantidade());
+                item.setValorUnitario(produto.getPrecovenda());
                 item.setPedido(pedido);
                 pedido.getItens().add(item);
+                
+                // Calcula o valor total
+                valorTotal += item.getQuantidade() * item.getValorUnitario();
             }
-            // Save the order again with items
-            pedido = pedidoRepository.save(pedido);
+            
+            pedido.setValorTotal(valorTotal);
         }
         
+        // Save the order
+        pedido = pedidoRepository.save(pedido);
         return convertToDTO(pedido);
     }
 
@@ -118,49 +130,40 @@ public class PedidoService {
         if (pedidoDTO.getIdEndereco() != null) {
             pedido.setIdEndereco(pedidoDTO.getIdEndereco());
         }
-        if (pedidoDTO.getValorTotal() != null) {
-            pedido.setValorTotal(pedidoDTO.getValorTotal());
-        }
         if (pedidoDTO.getObservacoes() != null) {
             pedido.setObservacoes(pedidoDTO.getObservacoes());
         }
         
         // Atualiza os itens do pedido
         if (pedidoDTO.getItens() != null && !pedidoDTO.getItens().isEmpty()) {
-            // Mapa para rastrear itens existentes
-            Map<Long, ItemPedido> itensExistentes = pedido.getItens().stream()
-                .collect(Collectors.toMap(ItemPedido::getId, item -> item));
+            // Limpa os itens existentes
+            pedido.getItens().clear();
             
-            // Lista para armazenar os itens que serão mantidos
-            List<ItemPedido> itensAtualizados = new ArrayList<>();
+            double valorTotal = 0.0;
             
-            // Processa cada item do DTO
+            // Adiciona os novos itens
             for (ItemPedidoDTO itemDTO : pedidoDTO.getItens()) {
-                // Valida se o produto existe
-                produtoRepository.findById(itemDTO.getProdutoId())
+                // Busca o produto e seu preço
+                Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + itemDTO.getProdutoId()));
                 
-                ItemPedido item;
-                if (itemDTO.getId() != null && itensExistentes.containsKey(itemDTO.getId())) {
-                    // Reutiliza o item existente
-                    item = itensExistentes.get(itemDTO.getId());
-                    item.setQuantidade(itemDTO.getQuantidade());
-                    item.setValorUnitario(itemDTO.getValorUnitario());
-                    item.setObservacoes(itemDTO.getObservacoes());
-                } else {
-                    // Cria um novo item
-                    item = convertToItemPedido(itemDTO);
-                    item.setPedido(pedido);
-                }
-                itensAtualizados.add(item);
+                ItemPedido item = new ItemPedido();
+                item.setProduto(produto);
+                item.setQuantidade(itemDTO.getQuantidade());
+                item.setValorUnitario(produto.getPrecovenda());
+                item.setPedido(pedido);
+                pedido.getItens().add(item);
+                
+                // Calcula o valor total
+                valorTotal += item.getQuantidade() * item.getValorUnitario();
             }
             
-            // Atualiza a lista de itens do pedido
-            pedido.getItens().clear();
-            pedido.getItens().addAll(itensAtualizados);
+            pedido.setValorTotal(valorTotal);
         }
         
-        return convertToDTO(pedidoRepository.save(pedido));
+        // Salva o pedido e retorna o DTO
+        pedido = pedidoRepository.save(pedido);
+        return convertToDTO(pedido);
     }
 
     @Transactional
@@ -247,22 +250,19 @@ public class PedidoService {
 
     private ItemPedido convertToItemPedido(ItemPedidoDTO dto) {
         ItemPedido item = new ItemPedido();
-        item.setProduto(produtoRepository.findById(dto.getProdutoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado")));
+        Produto produto = produtoRepository.findById(dto.getProdutoId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        item.setProduto(produto);
         item.setQuantidade(dto.getQuantidade());
-        item.setValorUnitario(dto.getValorUnitario());
-        item.setObservacoes(dto.getObservacoes());
+        item.setValorUnitario(produto.getPrecovenda());
         return item;
     }
 
     private ItemPedidoDTO convertToItemPedidoDTO(ItemPedido item) {
         ItemPedidoDTO dto = new ItemPedidoDTO();
-        dto.setId(item.getId());
         dto.setPedidoId(item.getPedido().getId());
         dto.setProdutoId(item.getProduto().getId());
         dto.setQuantidade(item.getQuantidade());
-        dto.setValorUnitario(item.getValorUnitario());
-        dto.setObservacoes(item.getObservacoes());
         return dto;
     }
 } 

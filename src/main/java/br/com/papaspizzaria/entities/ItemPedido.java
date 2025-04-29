@@ -27,6 +27,4 @@ public class ItemPedido {
     
     @Column(name = "valor_unitario")
     private Double valorUnitario;
-    
-    private String observacoes;
 } 
