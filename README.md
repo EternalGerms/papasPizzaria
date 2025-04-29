@@ -12,8 +12,8 @@
 | Elaboração de Relatórios  | Rafael              | 30/03/2025            | 🟡     |
 | Manter Produtos           | Bruno Bueno         | 02/03/2025            | 🟢     |
 | Visualização de Produto   | Rebeca              | 09/04/2025            | 🟡     |
-| Manter Pedidos            | Bruno Bueno         | 12/03/2025            | 🟡     |
-| Personalização de Pedidos | Bruno Bueno         | 22/03/2025            | 🟡     |
+| Manter Pedidos            | Bruno Bueno         | 12/03/2025            | 🟢     |
+| Personalização de Pedidos | Bruno Bueno         | 22/03/2025            | 🟢     |
 | Gestão de Entregas        | Matheus             | 09/04/2025            | 🟡     |
 | Opções de Pagamento       | Bruno Bueno         | 09/04/2025            | 🟡     |
 | Revisão e Testes          | João                | 09/04/2025            | 🟡     |
